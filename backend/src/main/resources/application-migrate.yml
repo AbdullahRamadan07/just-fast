@@ -1,0 +1,6 @@
+# Used by the Kubernetes migration Job: apply Flyway migrations, then exit.
+spring:
+  main:
+    web-application-type: none
+  flyway:
+    enabled: true

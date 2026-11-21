@@ -1,0 +1,32 @@
+# Production: managed MySQL (with automated backups) and Stripe Checkout.
+# The "just-fast-secrets" Secret is NOT generated here: create it from your secret manager
+# (e.g. External Secrets Operator / Sealed Secrets) with the keys listed in the README.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: just-fast
+
+resources:
+  - ../../base
+
+images:
+  # Base images are already renamed to the registry path; pin the release tag here.
+  - name: ghcr.io/your-org/just-fast-api
+    newTag: "0.1.0"
+  - name: ghcr.io/your-org/just-fast-web
+    newTag: "0.1.0"
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: just-fast-config
+    patch: |-
+      - op: replace
+        path: /data/DB_URL
+        value: jdbc:mysql://your-managed-mysql.example.com:3306/justfast?serverTimezone=UTC&sslMode=REQUIRED
+      - op: replace
+        path: /data/PUBLIC_BASE_URL
+        value: https://shop.example.com
+      - op: replace
+        path: /data/PAYMENT_PROVIDER
+        value: stripe

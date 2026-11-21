@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: just-fast
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: just-fast
+    includeSelectors: false
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - backend.yaml
+  - frontend.yaml
+  - ingress.yaml
+  - migration-job.yaml
+
+images:
+  - name: just-fast-api
+    newName: ghcr.io/your-org/just-fast-api
+    newTag: latest
+  - name: just-fast-web
+    newName: ghcr.io/your-org/just-fast-web
+    newTag: latest

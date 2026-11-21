@@ -1,0 +1,18 @@
+# Non-secret API configuration. Secrets (DB credentials, admin password, payment keys) live in the
+# "just-fast-secrets" Secret, which each overlay provides.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: just-fast-config
+  labels:
+    app.kubernetes.io/component: platform
+data:
+  DB_URL: jdbc:mysql://mysql:3306/justfast?serverTimezone=UTC
+  PUBLIC_BASE_URL: https://shop.example.com
+  COOKIE_SECURE: "true"
+  # Migrations run in a separate Job before rollout (see deploy/k8s/deploy.sh).
+  FLYWAY_ENABLED: "false"
+  STORE_CURRENCY: USD
+  STORE_SHIPPING_COUNTRY: US
+  STORE_SHIPPING_FEE: "5.00"
+  PAYMENT_PROVIDER: stripe

@@ -1,0 +1,19 @@
+# Build output
+backend/target/
+frontend/dist/
+frontend/.angular/
+frontend/node_modules/
+
+# Local config & secrets
+.env
+deploy/k8s/overlays/*/secrets.env
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local tooling
+.claude/

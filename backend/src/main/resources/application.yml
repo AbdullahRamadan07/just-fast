@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: just-fast-api
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/justfast?serverTimezone=UTC}
+    username: ${DB_USERNAME:justfast}
+    password: ${DB_PASSWORD:justfast}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+  session:
+    jdbc:
+      initialize-schema: never
+    timeout: 8h
+  jackson:
+    default-property-inclusion: non_null
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: 8080
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+  servlet:
+    session:
+      cookie:
+        name: JF_SESSION
+        http-only: true
+        secure: ${COOKIE_SECURE:true}
+        same-site: lax
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+store:
+  # One currency, one shipping region (see README).
+  currency: ${STORE_CURRENCY:USD}
+  shipping-country: ${STORE_SHIPPING_COUNTRY:US}
+  flat-shipping-fee: ${STORE_SHIPPING_FEE:5.00}
+  # Public origin that serves both the Angular app and /api.
+  public-base-url: ${PUBLIC_BASE_URL:https://localhost}
+  reservation-ttl: ${RESERVATION_TTL:PT30M}
+  reconciliation-interval-ms: ${RECONCILIATION_INTERVAL_MS:60000}
+  admin:
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}
+
+payments:
+  # "sandbox" = built-in simulated hosted checkout, "stripe" = Stripe Checkout.
+  provider: ${PAYMENT_PROVIDER:sandbox}
+  sandbox:
+    webhook-secret: ${SANDBOX_WEBHOOK_SECRET:local-sandbox-secret-change-me}
+    # Where the simulated provider delivers webhooks (the API itself).
+    webhook-url: ${SANDBOX_WEBHOOK_URL:http://localhost:8080/api/payments/webhooks/sandbox}
+  stripe:
+    api-key: ${STRIPE_API_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    api-base-url: https://api.stripe.com
+
+logging:
+  level:
+    com.justfast: INFO

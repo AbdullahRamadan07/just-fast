@@ -1,0 +1,37 @@
+# One HTTPS origin for the SPA and the API: "/" → Angular, "/api" → Spring Boot.
+# Assumes ingress-nginx and cert-manager; adjust the class/annotations for your cluster.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: just-fast
+  labels:
+    app.kubernetes.io/component: app
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - shop.example.com
+      secretName: just-fast-tls
+  rules:
+    - host: shop.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  name: http

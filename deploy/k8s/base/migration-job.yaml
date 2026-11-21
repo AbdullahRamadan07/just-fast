@@ -1,0 +1,54 @@
+# Applies Flyway migrations with the API image and exits. deploy.sh runs this and waits for it to
+# complete before rolling out the new API version.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: just-fast-migrate
+  labels:
+    app.kubernetes.io/name: just-fast-migrate
+    app.kubernetes.io/component: migration
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: just-fast-migrate
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: just-fast-api
+          envFrom:
+            - configMapRef:
+                name: just-fast-config
+            - secretRef:
+                name: just-fast-secrets
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: migrate
+            - name: FLYWAY_ENABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
